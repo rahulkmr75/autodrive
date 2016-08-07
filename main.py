@@ -52,10 +52,16 @@ def main():
 		cv2.waitKey(32)
 
 		#the botpos
+<<<<<<< HEAD
 		pos0=opr.getCentroid(img,const.red_low,const.red_high)	
 		pos1=opr.getCentroid(img,const.blue_low,const.blue_high)
 		if (pos0==(-1,-1,0) or pos1==(-1,-1,0)):
 			continue 
+=======
+		pos0=opr.getCentroid(img,const.red_low,const.red_high)
+		pos1=opr.getCentroid(img,const.blue_low,const.blue_high)
+
+>>>>>>> d3f4966a025fef09571b35c41d060f6fcc6fde5e
 		#if some destination is commanded but the path is still 
 		#unknown 
 		if (len(dst)>0 and pp1==None):
@@ -108,7 +114,11 @@ def main():
 		cv2.circle(img,(pos1[0],pos1[1]),3,(255,0,0),-1)		
 
 		cv2.imshow("image",img)
+<<<<<<< HEAD
 		cv2.imshow("bacjup",bckup)
+=======
+		cv2.imshow("backup",bckup)
+>>>>>>> d3f4966a025fef09571b35c41d060f6fcc6fde5e
 	cv2.destroyAllWindows()
 	cap.release()
 
