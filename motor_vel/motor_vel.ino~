@@ -13,7 +13,7 @@ ros::NodeHandle nh;
 int m11,m12,m21,m22;
 
 //pins to which motor is to be connected
-int m1p1=9,m1p2=11,m2p1=3,m2p2=5;
+int m1p1=3,m1p2=5,m2p1=9,m2p2=10;
 
 /*messageCb1 is callback function for motor1
 * messageCb2 is callback function for motor2*/

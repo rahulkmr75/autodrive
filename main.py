@@ -31,17 +31,19 @@ def main():
 	pub1=rospy.Publisher("motor_vel1",Int16,queue_size=10)
 	pub2=rospy.Publisher("motor_vel2",Int16,queue_size=10)
 
-	cap=cv2.VideoCapture(1)
-
 	cv2.namedWindow("image")
 	cv2.namedWindow("gray")
-
+	cap=cv2.VideoCapture(2)
 	cv2.setMouseCallback("image",getDestination)
 	#stores the list of points in the path
 	pp1=None
 	pointer=-1
 	while not rospy.is_shutdown():
 		ret,img=cap.read()
+		if ret==0:
+			cv2.waitKey(32)
+			continue
+		print ret
 		bckup=np.copy(img)
 		img=cv2.pyrDown(img)
 
@@ -52,27 +54,28 @@ def main():
 		cv2.waitKey(32)
 
 		#the botpos
-<<<<<<< HEAD
-		pos0=opr.getCentroid(img,const.red_low,const.red_high)	
-		pos1=opr.getCentroid(img,const.blue_low,const.blue_high)
-		if (pos0==(-1,-1,0) or pos1==(-1,-1,0)):
-			continue 
-=======
 		pos0=opr.getCentroid(img,const.red_low,const.red_high)
 		pos1=opr.getCentroid(img,const.blue_low,const.blue_high)
+		if (pos0==(-1,-1,0) or pos1==(-1,-1,0)):
+			cv2.waitKey(32)
+			continue
 
->>>>>>> d3f4966a025fef09571b35c41d060f6fcc6fde5e
+
+
 		#if some destination is commanded but the path is still 
 		#unknown 
 		if (len(dst)>0 and pp1==None):
 					
 			#using blur to avoid collision with objects
-			obst=cv2.medianBlur(img,5)
+			obst=cv2.inRange(img,const.obst_low,const.obst_high)
+			ret, obst= cv2.threshold(obst,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+			kernel = np.ones((5,5),np.uint8)
+			obst = cv2.erode(obst,kernel,iterations = 1)
+			obst=cv2.medianBlur(obst,5)
 			obst=cv2.blur(obst,(15,15))
 			obst=cv2.GaussianBlur(obst,(9,9),0)
 			obst=cv2.blur(obst,(15,15))
-			obst=cv2.inRange(obst,const.floor_low,const.floor_high)
-			ret, obst= cv2.threshold(obst,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+
 
 			#the simple path points
 			pp1=opr.listPathPoints1(pos0,dst[0])
@@ -99,11 +102,14 @@ def main():
 
 			#flush the current target if it's too close
 			if (opr.distance(pp1[pointer],pos0)<const.th_lin):
-				pointer=pointer+5
-
+				pointer=pointer+10
+			
+			print len(pp1),pointer
 			#if destination is reached goto next point 
 			if (pointer>len(pp1)):
 				pp1=None
+				pub2.publish(0)
+				pub1.publish(0)
 				dst.pop(0)
 			cv2.circle(img,(dst[0][0],dst[0][1]),3,(255,0,0),-1)
 
@@ -114,11 +120,7 @@ def main():
 		cv2.circle(img,(pos1[0],pos1[1]),3,(255,0,0),-1)		
 
 		cv2.imshow("image",img)
-<<<<<<< HEAD
-		cv2.imshow("bacjup",bckup)
-=======
 		cv2.imshow("backup",bckup)
->>>>>>> d3f4966a025fef09571b35c41d060f6fcc6fde5e
 	cv2.destroyAllWindows()
 	cap.release()
 
