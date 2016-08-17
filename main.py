@@ -9,6 +9,10 @@ import const
 import opr
 import pid
 
+
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out=cv2.VideoWriter('output.avi',fourcc,30.0,(320,240))
+
 def pack(x):
 	if x<0:
 		x=abs(x)
@@ -33,7 +37,7 @@ def main():
 
 	cv2.namedWindow("image")
 	cv2.namedWindow("gray")
-	cap=cv2.VideoCapture(2)
+	cap=cv2.VideoCapture(1)
 	cv2.setMouseCallback("image",getDestination)
 	#stores the list of points in the path
 	pp1=None
@@ -94,25 +98,27 @@ def main():
 			if pose_err>math.pi:
 				pose_err=pose_err-2*math.pi
 
+			'''getting motor velocities but is not being published 
+				yet'''
 			motor_vel=pid.getVelocity(pose_err,pos0,pp1[pointer])
 			motor_vel1=motor_vel[0]
 			pub1.publish(motor_vel1)
 			motor_vel2=motor_vel[1]
 			pub2.publish(motor_vel2)
-
+			
 			#flush the current target if it's too close
 			if (opr.distance(pp1[pointer],pos0)<const.th_lin):
 				pointer=pointer+10
 			
-			print len(pp1),pointer
+			#print len(pp1),pointer
 			#if destination is reached goto next point 
-			if (pointer>len(pp1)):
+			if (pointer>len(pp1) or opr.distance(pp1[len(pp1)-1],((pos0[0]+pos1[0])/2,(pos0[1]+pos1[1])/2))<const.th_lin):
 				pp1=None
 				pub2.publish(0)
 				pub1.publish(0)
 				dst.pop(0)
 			cv2.circle(img,(dst[0][0],dst[0][1]),3,(255,0,0),-1)
-
+		print "pointer : ", pointer
 		if cv2.waitKey(32) & 0xFF==ord('q'):
 			break
 
@@ -120,6 +126,10 @@ def main():
 		cv2.circle(img,(pos1[0],pos1[1]),3,(255,0,0),-1)		
 
 		cv2.imshow("image",img)
+
+		#writing the file
+		out.write(img)
+
 		cv2.imshow("backup",bckup)
 	cv2.destroyAllWindows()
 	cap.release()

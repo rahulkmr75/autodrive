@@ -43,7 +43,7 @@ ros::Publisher p("my_topic", &test);
 void unpack1(int x){
   if(x<0){
     m11=0;
-    m12=x;
+    m12=-1*x;
   }
   else{
     m11=x;
@@ -52,11 +52,12 @@ void unpack1(int x){
 }
 void unpack2(int y){
   if(y<0){
+    y=y-15;
     m21=0;
-    m22=255-y;
+    m22=-1*y;
   }
   else{
-    m21=y;
+    m21=y+15;
     m22=0;
   }
 }
