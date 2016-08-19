@@ -32,13 +32,10 @@ def getTheta(p0,p1,p2):
     except ZeroDivisionError:
         theta2=0
     #print vec,theta2
-    theta3=theta2-theta1
-    print theta3
-    if theta3>math.pi:
-	theta3=theta3-2*math.pi
-    elif theta3<(-1*math.pi):
-	theta3=theta3+2*math.pi
-    print theta1,theta2,theta3
+	theta3=theta2-theta1
+	print theta3
+	theta3=(theta3%(math.pi))*(-1)
+	print theta1,theta2,theta3
     return theta3
 #gives you the centroid of a region after masking and other crap
 def getCentroid(img,low,up):

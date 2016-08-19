@@ -11,7 +11,7 @@ import pid
 
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out=cv2.VideoWriter('output.avi',fourcc,30.0,(320,240))
+out=cv2.VideoWriter('output.avi',fourcc,10.0,(320,240))
 
 def pack(x):
 	if x<0:
@@ -58,7 +58,9 @@ def main():
 		cv2.waitKey(32)
 
 		#the botpos
+		#red back
 		pos0=opr.getCentroid(img,const.red_low,const.red_high)
+		#green front
 		pos1=opr.getCentroid(img,const.blue_low,const.blue_high)
 		if (pos0==(-1,-1,0) or pos1==(-1,-1,0)):
 			cv2.waitKey(32)
@@ -100,19 +102,19 @@ def main():
 
 			'''getting motor velocities but is not being published 
 				yet'''
-			motor_vel=pid.getVelocity(pose_err,pos0,pp1[pointer])
+			motor_vel=pid.getVelocity(pose_err,pos1,pp1[pointer])
 			motor_vel1=motor_vel[0]
 			pub1.publish(motor_vel1)
 			motor_vel2=motor_vel[1]
 			pub2.publish(motor_vel2)
 			
 			#flush the current target if it's too close
-			if (opr.distance(pp1[pointer],pos0)<const.th_lin):
+			if (opr.distance(pp1[pointer],pos1)<const.th_lin or  opr.distance(pp1[pointer],pos0)<const.th_lin):
 				pointer=pointer+10
 			
 			#print len(pp1),pointer
 			#if destination is reached goto next point 
-			if (pointer>len(pp1) or opr.distance(pp1[len(pp1)-1],((pos0[0]+pos1[0])/2,(pos0[1]+pos1[1])/2))<const.th_lin):
+			if (pointer>len(pp1) or opr.distance(pp1[len(pp1)-1],pos1)<const.th_lin or  opr.distance(pp1[len(pp1)-1],pos0)<const.th_lin):
 				pp1=None
 				pub2.publish(0)
 				pub1.publish(0)

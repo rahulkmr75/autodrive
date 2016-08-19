@@ -3,9 +3,9 @@ import numpy as np
 
 '''the pid constants'''
 #assuming the max pixel difference is 30 
-kp_lin=8
+kp_lin=14
 #setting it to 120 maps max to 240
-kp_ang=100 
+kp_ang=150 
 #the linear velocity when angular error is not zero
 k0=0.5
 
